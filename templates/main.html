@@ -1,34 +1,69 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="author" content="Michał Chrzanowski">
+    <meta name="author" content="Michał Chrzanowski">
     <title>YouTube Player interface</title>
-	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome-all.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome-all.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bulma.css') }}">
-  </head>
-  <body style="background-color: #9b969c">
-  <section class="section">
+
+    <script type=text/javascript src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}">
+
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+
+          $(function() {
+            $('a#calculate').bind('click', function() {
+              $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
+                a: $('input[name="a"]').val(),
+                b: $('input[name="b"]').val()
+              }, function(data) {
+                $("#result").text(data.result);
+              });
+              return false;
+            });
+          });
+
+        $(document).ready(function(){
+            $("#input_container").click(function(){
+                $("#input_info").text("The YouTube video link is valid.");
+                $("#input_info").removeClass("is-warning");
+                $("#input_info").addClass("is-success");
+                $("#input_field").removeClass("is-warning");
+                $("#input_field").addClass("is-success");
+                $("#input_icon").html('<i class="fa fa-check"></i>');
+            });
+        });
+    </script>
+
+</head>
+<body style="background-color: #9b969c">
+<section class="section">
     <div class="container">
-      <h1 class="title">
-        YouTube player web interface
-      </h1>
-        <div class="field">
-          <label class="label">Enter YT link, video ID or search phrase</label>
-          <div class="control has-icons-left has-icons-right">
-            <input class="input is-success" type="text" placeholder="Search video">
-            <span class="icon is-small is-left">
-              <i class="fa fa-play-circle" aria-hidden="true"></i>
-            </span>
-            <span class="icon is-small is-right">
-              <i class="fa fa-check"></i>
-            </span>
-          </div>
-          <p class="help is-success">The YouTube video link is valid.</p>
+        <h1 class="title">
+            YouTube player web interface
+        </h1>
+<p><input type=text size=5 name=a> +
+   <input type=text size=5 name=b> =
+   <span id=result>?</span>
+<p><a href=# id=calculate>calculate server side</a>
+        <div class="field" id="input_container">
+            <label class="label">Enter YT link, video ID or search phrase</label>
+            <div class="control has-icons-left has-icons-right">
+                <input id="input_field" class="input" type="text" placeholder="Play video or search for it">
+                <span class="icon is-small is-left">
+                  <i class="fa fa-play-circle" aria-hidden="true"></i>
+                </span>
+                <span id="input_icon" class="icon is-small is-right">
+                </span>
+            </div>
+            <p id="input_info" class="help">
+                This is not YouTube video link or ID. Search will be performed.
+            </p>
         </div>
     </div>
-  </section>
-  </body>
+</section>
+</body>
 </html>
