@@ -38,20 +38,25 @@ class ResultsParser(HTMLParser):
         })
 
 
-# query_string = parse.urlencode({"search_query": input("what do you look for? ")})
-query_string = parse.urlencode({"search_query": "dream theater full"})
-html_content = request.urlopen("http://www.youtube.com/results?" + query_string)
-results_html = str(html_content.read())
+def get_yt_search_results(search_string):
+    query_string = parse.urlencode({"search_query": search_string})
+    html_content = request.urlopen("http://www.youtube.com/results?" + query_string)
+    results_html = str(html_content.read())
 
-parser = ResultsParser()
-parser.feed(results_html)
-search_results = parser.data
+    parser = ResultsParser()
+    parser.feed(results_html)
+    return parser.data
 
-index = 0
-for result in search_results:
-    print(index, ". ", result['title'])
-    index += 1
 
-chosen_index = int(input("Which track do you wish to hear? "))
-chosen_video = pafy.new(search_results[chosen_index]['video_id'])
-play(chosen_video)
+if __name__ == '__main__':
+    _search_string = input("what do you look for? ")
+    search_results = get_yt_search_results(_search_string)
+
+    index = 0
+    for result in search_results:
+        print(index, ". ", result['title'])
+        index += 1
+
+    chosen_index = int(input("Which track do you wish to hear? "))
+    chosen_video = pafy.new(search_results[chosen_index]['video_id'])
+    play(chosen_video)
