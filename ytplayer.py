@@ -1,7 +1,7 @@
 import os
 from urllib import parse, request
 from html.parser import HTMLParser
-from multiprocessing import Process
+import subprocess
 
 import pafy
 
@@ -9,9 +9,7 @@ import pafy
 def play(video):
     player = "C:\\Program Files (x86)\\foobar2000\\foobar2000.exe"
 
-    audio_url = ' "' + video.getbestaudio().url + '"'
-
-    os.execv(player, [audio_url])
+    return subprocess.Popen([player, video.getbestaudio().url])
 
 
 class ResultsParser(HTMLParser):
@@ -55,7 +53,8 @@ def get_yt_search_results(search_string):
 
 
 if __name__ == '__main__':
-    _search_string = input("what do you look for? ")
+    # _search_string = input("what do you look for? ")
+    _search_string = "takk"
     search_results = get_yt_search_results(_search_string)
 
     index = 0
@@ -63,6 +62,9 @@ if __name__ == '__main__':
         print(index, ". ", result['title'])
         index += 1
 
-    chosen_index = int(input("Which track do you wish to hear? "))
+    # chosen_index = int(input("Which track do you wish to hear? "))
+    chosen_index = 0
     chosen_video = pafy.new(search_results[chosen_index]['video_id'])
-    play(chosen_video)
+    play_process = play(chosen_video)
+    input("waiting")
+    play_process.kill()
