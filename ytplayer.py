@@ -15,6 +15,7 @@ def play(video):
 
 class ResultsParser(HTMLParser):
     data = []
+    ids = []
 
     def handle_starttag(self, tag, attrs):
         if tag != 'a':
@@ -28,10 +29,13 @@ class ResultsParser(HTMLParser):
                 if '/watch?v=' not in attribute[1]:
                     return
                 video_id = attribute[1][-11:]
+                if video_id in self.ids:
+                    return
 
             if attribute[0] == 'title':
                 title = attribute[1]
 
+        self.ids.append(video_id)
         self.data.append({
             'title': title,
             'video_id': video_id
@@ -41,7 +45,8 @@ class ResultsParser(HTMLParser):
 def get_yt_search_results(search_string):
     query_string = parse.urlencode({"search_query": search_string})
     html_content = request.urlopen("http://www.youtube.com/results?" + query_string)
-    results_html = str(html_content.read())
+    encoding = html_content.getheader('Content-Type').split('charset=')[-1]
+    results_html = html_content.read().decode(encoding)
 
     parser = ResultsParser()
     parser.feed(results_html)
