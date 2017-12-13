@@ -1,8 +1,19 @@
 from flask import Flask, render_template, jsonify, request
+import zmq
 
 from ytplayer import get_yt_search_results
 
 flask_app = Flask(__name__)
+
+
+def request_playback(control_data):
+    zmq_client = zmq.Context().socket(zmq.REQ)
+    try:
+        zmq_client.connect("tcp://localhost:7773")
+    except zmq.error.ZMQError as e:
+        print("tcp://localhost:7773" + str(e))
+        return
+    zmq_client.send_pyobj(control_data)
 
 
 @flask_app.route("/")
@@ -20,12 +31,13 @@ def play_video():
     with open("status.txt", 'r') as status_log:
         previous_video_id = status_log.read()
 
-    if previous_video_id == video_id:
-        _status = "stopped"
-    else:
-        _status = "playing"
-
     with open("status.txt", 'w') as status_log:
-        status_log.write(video_id)
+        if previous_video_id == video_id:
+            _status = "stopped"
+        else:
+            _status = "playing"
+            status_log.write(video_id)
+
+    request_playback({'video_id': video_id})
 
     return jsonify(status=_status)
