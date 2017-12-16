@@ -15,7 +15,7 @@ def play(video_id):
         player_command = [player, video_url]
     elif platform.system() == "Linux":
         player = "mplayer"
-        player_command = [player, video_url, "-ao alsa:device=bluealsa"]
+        player_command = [player, "-ao", "alsa:device=bluealsa", video_url]
     else:
         print("Unsupported OS: %s" % platform.system())
         return
