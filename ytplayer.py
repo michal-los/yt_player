@@ -7,17 +7,20 @@ import pafy
 
 
 def play(video_id):
+    video = pafy.new(video_id)
+    video_url = video.getbestaudio().url
+
     if platform.system() == "Windows":
         player = "C:\\Program Files (x86)\\foobar2000\\foobar2000.exe"
+        player_command = [player, video_url]
     elif platform.system() == "Linux":
         player = "mplayer"
+        player_command = [player, video_url, "-ao alsa:device=bluealsa"]
     else:
         print("Unsupported OS: %s" % platform.system())
         return
 
-    video = pafy.new(video_id)
-    video_url = video.getbestaudio().url
-    return subprocess.Popen([player, video_url])
+    return subprocess.Popen(player_command)
 
 
 class ResultsParser(HTMLParser):
