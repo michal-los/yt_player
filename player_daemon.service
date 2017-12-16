@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-User=root
+User=pi
 WorkingDirectory=/home/pi/yt_player
 ExecStart=+/usr/bin/python3 /home/pi/yt_player/player_service.py
 KillMode=process
