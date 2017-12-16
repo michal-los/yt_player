@@ -1,0 +1,13 @@
+[Unit]
+Description=Mini site - interface to youtube player
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/pi/ytplayer
+ExecStart=+/usr/bin/python3 /home/pi/ytplayer/player_service.py
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
