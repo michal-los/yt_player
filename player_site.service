@@ -7,7 +7,7 @@ Type=simple
 User=root
 Environment=FLASK_APP=player_site.py
 WorkingDirectory=/home/pi/yt_player
-ExecStart=+/usr/bin/flask run --host 192.168.0.51 --port 80
+ExecStart=+/usr/local/bin/flask run --host 192.168.0.51 --port 80
 KillMode=process
 
 [Install]
