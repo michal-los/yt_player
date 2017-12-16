@@ -23,6 +23,18 @@ def play(video_id):
     return subprocess.Popen(player_command)
 
 
+def set_volume(volume):
+    volume_command = [
+        "amixer",
+        "-D",
+        "bluealsa",
+        "sset",
+        "'DANCER ROCK - A2DP'",
+        str(volume) + "%"
+    ]
+    return subprocess.run(volume_command)
+
+
 class ResultsParser(HTMLParser):
 
     def reset(self):
