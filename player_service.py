@@ -17,7 +17,8 @@ logger.debug("Initializing service...")
 def get_control_data():
     zmq_socket = zmq.Context().socket(zmq.REP)
     zmq_socket.bind('tcp://*:7773')
-    return zmq_socket.recv_pyobj()
+    request = zmq_socket.recv_pyobj()
+    return request
 
 
 if __name__ == '__main__':
