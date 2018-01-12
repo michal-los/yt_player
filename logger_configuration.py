@@ -40,7 +40,7 @@ def configure_logger(log_file_name="logfile.log",
         if log_file_size_bytes > log_file_size_limit_bytes:
             backup_and_clear_logfile(log_file_name)
 
-    _logger = logging.getLogger('Dimmer control daemon')
+    _logger = logging.getLogger('Youtube Player')
     log_file = logging.FileHandler(log_file_name)
 
     logs_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')

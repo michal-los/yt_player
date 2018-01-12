@@ -2,37 +2,102 @@ from urllib import parse, request
 from html.parser import HTMLParser
 import subprocess
 import platform
+from logging import getLogger
 
 import pafy
 
 
-def play(video_id):
-    video = pafy.new(video_id)
-    video_url = video.getbestaudio().url
+class YouTubePlayer:
+    def __init__(self):
+        self.player_process = None
+        self.now_playing = {
+                'video_id': None,
+                'title': None,
+                'duration': None,
+                'thumbnail': None,
+                'status': 'stopped',
+            }
+        self.logger = getLogger()
 
-    if platform.system() == "Windows":
-        player = "C:\\Program Files (x86)\\foobar2000\\foobar2000.exe"
-        player_command = [player, video_url]
-    elif platform.system() == "Linux":
-        player = "mplayer"
-        player_command = [player, "-ao", "alsa:device=bluealsa", video_url]
-    else:
-        print("Unsupported OS: %s" % platform.system())
-        return
+    def __del__(self):
+        self.stop()
 
-    return subprocess.Popen(player_command)
+    def play(self, video_id):
+        video = pafy.new(video_id)
+        video_url = video.getbestaudio().url
 
+        if platform.system() == "Windows":
+            player = "C:\\Program Files (x86)\\foobar2000\\foobar2000.exe"
+            player_command = [player, video_url]
+        elif platform.system() == "Linux":
+            player = "mplayer"
+            player_command = [player, "-ao", "alsa:device=bluealsa", video_url]
+        else:
+            self.logger.error("Unsupported OS: %s" % platform.system())
+            raise OSError
 
-def set_volume(volume):
-    volume_command = [
-        "amixer",
-        "-D",
-        "bluealsa",
-        "sset",
-        "'DANCER ROCK - A2DP'",
-        str(volume) + "%"
-    ]
-    return subprocess.run(volume_command)
+        self.stop()
+        try:
+            self.player_process = subprocess.Popen(player_command)
+            self.now_playing = {
+                'video_id': video.videoid,
+                'title': video.title,
+                'duration': video.duration,
+                'thumbnail': video.thumb,
+                'status': 'playing',
+            }
+            self.logger.debug("Now playing %s" % video.title)
+        except Exception as e:
+            self.logger.error(repr(e))
+
+    def stop(self):
+        try:
+            self.player_process.kill()
+            self.now_playing['status'] = 'stopped'
+            self.logger.debug("Player process stopped.")
+        except AttributeError:
+            self.logger.debug("Could not kill - subprocess was not created.")
+
+    def set_volume(self, volume):
+        if platform.system() == "Windows":
+            volume_options = {
+                90: "Set to -0 dB",
+                80: "Set to -3 dB",
+                70: "Set to -6 dB",
+                60: "Set to -9 dB",
+                50: "Set to -12 dB",
+                40: "Set to -15 dB",
+                30: "Set to -18 dB",
+                20: "Set to -21 dB",
+            }
+            volume_string = "Mute"
+            for possible_volume, possible_volume_string in volume_options.items():
+                if possible_volume <= volume < possible_volume + 10:
+                    volume_string = possible_volume_string
+                    break
+            volume_command = [
+                'C:\\Program Files (x86)\\foobar2000\\foobar2000.exe',
+                '/command:"',
+                volume_string + '"'
+            ]
+        elif platform.system() == "Linux":
+            volume_command = [
+                "amixer",
+                "-D",
+                "bluealsa",
+                "sset",
+                "'DANCER ROCK - A2DP'",
+                str(volume) + "%"
+            ]
+        else:
+            self.logger.error("Unsupported OS: %s" % platform.system())
+            raise OSError
+
+        try:
+            subprocess.run(volume_command)
+            self.logger.debug("Volume set to %d" % volume)
+        except Exception as e:
+            self.logger.error(repr(e))
 
 
 class ResultsParser(HTMLParser):
@@ -70,7 +135,6 @@ class ResultsParser(HTMLParser):
 
 def get_yt_search_results(search_string):
     query_string = parse.urlencode({"search_query": search_string})
-    print(search_string)
     html_content = request.urlopen("http://www.youtube.com/results?" + query_string)
     encoding = html_content.getheader('Content-Type').split('charset=')[-1]
     results_html = html_content.read().decode(encoding)
@@ -92,6 +156,7 @@ if __name__ == '__main__':
         index += 1
 
     chosen_index = int(input("Which track do you wish to hear? "))
-    play_process = play(search_results[chosen_index]['video_id'])
+    myplayer = YouTubePlayer()
+    myplayer.play(search_results[chosen_index]['video_id'])
     input("Press [Enter] to stop playback.")
-    play_process.kill()
+    myplayer.stop()

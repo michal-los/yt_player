@@ -15,39 +15,39 @@
         $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>
 
-    <script>
-        $(document).keyup(function(){
-            $input_value = $("#input_field").val();
-            if($input_value.includes("watch")) {
-                $("#input_info").text("The YouTube video link is valid.");
-                $("#input_info").addClass("is-success");
-                $("#input_field").addClass("is-success");
-                $("#input_icon").html('<i class="fa fa-check"></i>');
-            }
-            else {
-                $("#input_info").text("This is not YouTube video link or ID. Search will be performed.");
-                $("#input_info").removeClass("is-success");
-                $("#input_field").removeClass("is-success");
-                $("#input_icon").html('<i class="fa fa-search"></i>');
-            }
-        });
+    <!--<script>-->
+        <!--$(document).keyup(function(){-->
+            <!--$input_value = $("#input_field").val();-->
+            <!--if($input_value.includes("watch")) {-->
+                <!--$("#input_info").text("The YouTube video link is valid.");-->
+                <!--$("#input_info").addClass("is-success");-->
+                <!--$("#input_field").addClass("is-success");-->
+                <!--$("#input_icon").html('<i class="fa fa-check"></i>');-->
+            <!--}-->
+            <!--else {-->
+                <!--$("#input_info").text("This is not YouTube video link or ID. Search will be performed.");-->
+                <!--$("#input_info").removeClass("is-success");-->
+                <!--$("#input_field").removeClass("is-success");-->
+                <!--$("#input_icon").html('<i class="fa fa-search"></i>');-->
+            <!--}-->
+        <!--});-->
 
-        $(document).mouseup(function(){
-            $input_value = $("#input_field").val();
-            if($input_value.includes("watch")) {
-                $("#input_info").text("The YouTube video link is valid.");
-                $("#input_info").addClass("is-success");
-                $("#input_field").addClass("is-success");
-                $("#input_icon").html('<i class="fa fa-check"></i>');
-            }
-            else {
-                $("#input_info").text("This is not YouTube video link or ID. Search will be performed.");
-                $("#input_info").removeClass("is-success");
-                $("#input_field").removeClass("is-success");
-                $("#input_icon").html('<i class="fa fa-search"></i>');
-            }
-        });
-    </script>
+        <!--$(document).mouseup(function(){-->
+            <!--$input_value = $("#input_field").val();-->
+            <!--if($input_value.includes("watch")) {-->
+                <!--$("#input_info").text("The YouTube video link is valid.");-->
+                <!--$("#input_info").addClass("is-success");-->
+                <!--$("#input_field").addClass("is-success");-->
+                <!--$("#input_icon").html('<i class="fa fa-check"></i>');-->
+            <!--}-->
+            <!--else {-->
+                <!--$("#input_info").text("This is not YouTube video link or ID. Search will be performed.");-->
+                <!--$("#input_info").removeClass("is-success");-->
+                <!--$("#input_field").removeClass("is-success");-->
+                <!--$("#input_icon").html('<i class="fa fa-search"></i>');-->
+            <!--}-->
+        <!--});-->
+    <!--</script>-->
     <script>
         $(document).ready(function(){
             $("a").click(function(){
@@ -87,19 +87,19 @@
         </h1>
         <form name="search_box" action="/" method="get">
             <div class="field" id="input_container">
-                <label class="label">Enter YT link, video ID or search phrase</label>
+                <label class="label">Enter search phrase and hit [Enter]</label>
                 <div class="control has-icons-left has-icons-right">
-                    <input id="input_field" name="search" class="input" type="text" placeholder="Play video or search for it">
+                    <input id="input_field" name="search" class="input" type="text">
                     <span class="icon is-small is-left">
                       <i class="fa fa-play-circle" aria-hidden="true"></i>
                     </span>
-                    <span id="input_icon" class="icon is-small is-right">
-                    </span>
+                        <span id="input_icon" class="icon is-small is-right">
+                            <i class="fa fa-search"></i>
+                        </span>
                 </div>
                 <p id="input_info" class="help">
                     This is not YouTube video link or ID. Search will be performed.
                 </p>
-                <input type="submit" style="position: absolute; left: -9999px"/>
             </div>
         </form>
     </div>

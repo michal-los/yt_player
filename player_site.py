@@ -6,14 +6,15 @@ from ytplayer import get_yt_search_results
 flask_app = Flask(__name__)
 
 
-def request_playback(control_data):
-    zmq_client = zmq.Context().socket(zmq.REQ)
+def command_player(control_data):
+    zmq_socket = zmq.Context().socket(zmq.REQ)
     try:
-        zmq_client.connect("tcp://localhost:7773")
+        zmq_socket.connect("tcp://localhost:7773")
     except zmq.error.ZMQError as e:
         print("tcp://localhost:7773" + str(e))
         return
-    zmq_client.send_pyobj(control_data)
+    zmq_socket.send_pyobj(control_data)
+    return zmq_socket.recv_pyobj()
 
 
 @flask_app.route("/")
@@ -28,16 +29,16 @@ def main_page():
 @flask_app.route('/play_video')
 def play_video():
     video_id = request.args.get('video_id', "no video ID", type=str)
-    with open("status.txt", 'r') as status_log:
-        previous_video_id = status_log.read()
 
-    with open("status.txt", 'w') as status_log:
-        if previous_video_id == video_id:
-            _status = "stopped"
-        else:
-            _status = "playing"
-            status_log.write(video_id)
+    player_status = command_player({'command': 'get_status'})
+    if player_status['status'] == 'playing' and player_status['video_id'] == video_id:
+        player_command = {'command': 'stop'}
+    else:
+        player_command = {
+            'command': 'play',
+            'video_id': video_id
+        }
 
-    request_playback({'video_id': video_id})
+    player_status = command_player(player_command)
 
-    return jsonify(status=_status)
+    return jsonify(player_status)
