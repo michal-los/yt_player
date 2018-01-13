@@ -8,8 +8,10 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome-all.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bulma.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bulma-slider.css') }}">
 
     <script type=text/javascript src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
+    <script type=text/javascript src="{{ url_for('static', filename='js/slider.js') }}"></script>
 
     <script>
         $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
@@ -104,29 +106,50 @@
         </form>
     </div>
 
-    <div class="container box" style="margin-top: 30px; width: 700px;">
-      <article class="media">
+    <div class="container box" style="margin-top: 10px; width: 700px;">
+          <p class="title has-text-centered">Now playing</p>
+      <article class="media" style="margin-top: 10px;">
         <div class="media-left">
           <figure class="image is-64x64">
             <img src="" alt="Image">
           </figure>
         </div>
-        <div class="media-content">
-          <div class="content">
-            <p>
-              <strong id="playing_title">John Smith</strong> <small id="playiong_duration">@johnsmith</small>
-            </p>
-          </div>
-          <nav class="level is-mobile">
-            <div class="level-left">
+        <nav class="media-content">
+          <nav class="level">
+              <div class="level-item has-text-centered">
+                <div>
+                  <p class="title">
+                      <input class="slider is-success is-circle" step="1" min="0" max="100" value="50" type="range">
+                  </p>
+                  <p class="heading">volume</p>
+                </div>
+              </div>
+              <div class="level-item has-text-centered">
+                <div>
+                  <p class="title">title</p>
+                  <p class="heading">title</p>
+                </div>
+              </div>
+              <div class="level-item has-text-centered">
+                <div>
+                  <p class="title">00:00</p>
+                  <p class="heading">duration</p>
+                </div>
+              </div>
+          </nav>
+          <nav class="level">
+            <div class="level-item has-text-centered">
               <a class="level-item">
-                <span class="icon is-small"><i class="fas fa-reply"></i></span>
+                <span class="icon is-small"><i class="fa fa-play"></i></span>
               </a>
               <a class="level-item">
-                <span class="icon is-small"><i class="fas fa-retweet"></i></span>
+                <span class="icon is-small"><i class="fa fa-pause"></i></span>
               </a>
               <a class="level-item">
-                <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                <span class="icon is-small"><i class="fa fa-stop"></i></span>
+              </a>
+              <a class="level-item">
+                <span class="icon is-small"><i class="fa fa-window-close"></i></span>
               </a>
             </div>
           </nav>
