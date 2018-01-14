@@ -17,39 +17,6 @@
         $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>
 
-    <!--<script>-->
-    <!--$(document).keyup(function(){-->
-    <!--$input_value = $("#input_field").val();-->
-    <!--if($input_value.includes("watch")) {-->
-    <!--$("#input_info").text("The YouTube video link is valid.");-->
-    <!--$("#input_info").addClass("is-success");-->
-    <!--$("#input_field").addClass("is-success");-->
-    <!--$("#input_icon").html('<i class="fa fa-check"></i>');-->
-    <!--}-->
-    <!--else {-->
-    <!--$("#input_info").text("This is not YouTube video link or ID. Search will be performed.");-->
-    <!--$("#input_info").removeClass("is-success");-->
-    <!--$("#input_field").removeClass("is-success");-->
-    <!--$("#input_icon").html('<i class="fa fa-search"></i>');-->
-    <!--}-->
-    <!--});-->
-
-    <!--$(document).mouseup(function(){-->
-    <!--$input_value = $("#input_field").val();-->
-    <!--if($input_value.includes("watch")) {-->
-    <!--$("#input_info").text("The YouTube video link is valid.");-->
-    <!--$("#input_info").addClass("is-success");-->
-    <!--$("#input_field").addClass("is-success");-->
-    <!--$("#input_icon").html('<i class="fa fa-check"></i>');-->
-    <!--}-->
-    <!--else {-->
-    <!--$("#input_info").text("This is not YouTube video link or ID. Search will be performed.");-->
-    <!--$("#input_info").removeClass("is-success");-->
-    <!--$("#input_field").removeClass("is-success");-->
-    <!--$("#input_icon").html('<i class="fa fa-search"></i>');-->
-    <!--}-->
-    <!--});-->
-    <!--</script>-->
     <script>
         $(document).ready(function(){
             $("a").click(function(){
@@ -61,7 +28,7 @@
                     video_id: $video_id
                   }, function(data) {
                     $status = data.status;
-                    if (data.status !== "fail")
+                    if (data.status !== "playing")
                     {
                         $("tr").removeClass("is-selected");
                         $("a").removeClass("is-warning");
@@ -78,6 +45,20 @@
                 return false;
             });
         });
+    </script>
+
+    <script>
+        (function worker() {
+          $.getJSON($SCRIPT_ROOT + '/get_status', function(data) {
+            if (data.status == "playing")
+                {
+                $thumb_tag = '<img src="'.concat(data.thumbnail);
+                $thumb_tag = $thumb_tag.concat('" alt="Image">');
+                $("#track-thumb").html($thumb_tag);
+                }
+            setTimeout(worker, 5000);
+          });
+        })();
     </script>
 
 </head>
@@ -110,7 +91,7 @@
         <p class="title has-text-centered">Now playing</p>
         <article class="media" style="margin-top: 10px;">
             <div class="media-left">
-                <figure class="image is-64x64">
+                <figure class="image is-64x64" id="track-thumb">
                     <img src="" alt="Image">
                 </figure>
             </div>
@@ -119,20 +100,21 @@
                     <div class="level-item has-text-centered">
                         <div>
                             <p class="title">
-                                <input class="slider is-success is-circle" step="1" min="0" max="100" value="50" type="range">
+                                <input class="slider is-success is-circle" id="track-volume" step="1" min="0" max="100"
+                                       value="50" type="range">
                             </p>
                             <p class="heading">volume</p>
                         </div>
                     </div>
                     <div class="level-item has-text-centered">
                         <div>
-                            <p class="title">title</p>
+                            <p class="title" id="track_title"></p>
                             <p class="heading">title</p>
                         </div>
                     </div>
                     <div class="level-item has-text-centered">
                         <div>
-                            <p class="title">00:00</p>
+                            <p class="title" id="track_duration"></p>
                             <p class="heading">duration</p>
                         </div>
                     </div>

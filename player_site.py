@@ -42,3 +42,8 @@ def play_video():
     player_status = command_player(player_command)
 
     return jsonify(player_status)
+
+
+@flask_app.route('/get_status')
+def get_status():
+    return jsonify(command_player({'command': 'get_status'}))

@@ -9,7 +9,6 @@ from ytplayer import YouTubePlayer
 from logger_configuration import configure_logger
 
 
-# ---------------- INITIATING LOGGER ---------------
 logger = configure_logger("youtube_player_service.log", logging.DEBUG)
 logger.debug("Initializing service...")
 
