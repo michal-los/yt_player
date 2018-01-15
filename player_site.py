@@ -44,6 +44,17 @@ def play_video():
     return jsonify(player_status)
 
 
+@flask_app.route('/set_volume')
+def set_volume():
+    volume = request.args.get('volume', "no video ID", type=int)
+    player_command = {
+        'command': 'set_volume',
+        'volume': volume
+    }
+
+    return jsonify(command_player(player_command))
+
+
 @flask_app.route('/get_status')
 def get_status():
     return jsonify(command_player({'command': 'get_status'}))

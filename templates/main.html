@@ -19,7 +19,7 @@
 
     <script>
         $(document).ready(function(){
-            $("a").click(function(){
+            $("a[href='#result']").click(function(){
                 $video_id = $(this).attr("id")
                 $link_selector = "#".concat($video_id)
                 $row_selector = $link_selector.concat("-row")
@@ -27,13 +27,9 @@
                 $.getJSON($SCRIPT_ROOT + '/play_video', {
                     video_id: $video_id
                   }, function(data) {
-                    $status = data.status;
-                    if (data.status !== "playing")
-                    {
-                        $("tr").removeClass("is-selected");
-                        $("a").removeClass("is-warning");
-                        $("a").html('<i class="fa fa-play"></i>');
-                    }
+                    $("tr").removeClass("is-selected");
+                    $("a[href='#result']").removeClass("is-warning");
+                    $("a[href='#result']").html('<i class="fa fa-play"></i>');
 
                     if (data.status == "playing")
                     {
@@ -48,24 +44,40 @@
     </script>
 
     <script>
-        (function worker() {
-          $.getJSON($SCRIPT_ROOT + '/get_status', function(data) {
-            if (data.status == "playing")
+        $(document).ready(function(){
+            (function worker() {
+              $.getJSON($SCRIPT_ROOT + '/get_status', function(data) {
+                if (data.status == "playing")
                 {
-                $thumb_tag = '<img src="'.concat(data.thumbnail);
-                $thumb_tag = $thumb_tag.concat('" alt="Image">');
-                $("#track-thumb").html($thumb_tag);
+                    $thumb_tag = '<img src="'.concat(data.thumbnail);
+                    $thumb_tag = $thumb_tag.concat('" alt="Image">');
+                    $("#track-thumb").html($thumb_tag);
+                    $("#track-title").html(data.title);
+                    $("#track-duration").html(data.duration);
+                    $("#track-volume").attr('value', data.volume);
+                    $("#track-container").removeClass("is-hidden");
+
+                    $link_selector = "#".concat(data.video_id)
+                    $row_selector = $link_selector.concat("-row")
+                    $($row_selector).addClass("is-selected");
+                    $($link_selector).addClass("is-warning");
+                    $($link_selector).html('<i class="fa fa-stop"></i>');
                 }
-            setTimeout(worker, 5000);
-          });
-        })();
+                else
+                {
+                    $("#track-container").addClass("is-hidden");
+                }
+                setTimeout(worker, 5000);
+              });
+            })();
+        });
     </script>
 
 </head>
 <body style="background-color: #FFB16C">
 <section class="section">
     <div class="container" style="width: 700px">
-        <h1 class="title">
+        <h1 class="title has-text-centered">
             YouTube player web interface
         </h1>
         <form name="search_box" action="/" method="get">
@@ -87,11 +99,16 @@
         </form>
     </div>
 
-    <div class="container box" style="margin-top: 10px; width: 700px;">
-        <p class="title has-text-centered">Now playing</p>
+    <div class="container box is-hidden" id="track-container" style="margin-top: 10px; width: 700px;">
+        <div class="level-item has-text-centered">
+            <div>
+                <p class="title" id="track-title"></p>
+                <p class="heading">title</p>
+            </div>
+        </div>
         <article class="media" style="margin-top: 10px;">
             <div class="media-left">
-                <figure class="image is-64x64" id="track-thumb">
+                <figure class="image is-128x128" id="track-thumb">
                     <img src="" alt="Image">
                 </figure>
             </div>
@@ -108,30 +125,13 @@
                     </div>
                     <div class="level-item has-text-centered">
                         <div>
-                            <p class="title" id="track_title"></p>
-                            <p class="heading">title</p>
-                        </div>
-                    </div>
-                    <div class="level-item has-text-centered">
-                        <div>
-                            <p class="title" id="track_duration"></p>
+                            <p class="title" id="track-duration"></p>
                             <p class="heading">duration</p>
                         </div>
                     </div>
-                </nav>
-                <nav class="level">
-                        <div class="level-item has-text-centered"><a class="button">
-                            <span class="icon is-small"><i class="fa fa-play"></i></span>
-                        </a></div>
-                        <div class="level-item has-text-centered"><a class="button">
-                            <span class="icon is-small"><i class="fa fa-pause"></i></span>
-                        </a></div>
-                        <div class="level-item has-text-centered"><a class="button">
-                            <span class="icon is-small"><i class="fa fa-stop"></i></span>
-                        </a></div>
-                        <div class="level-item has-text-centered"><a class="button">
-                            <span class="icon is-small"><i class="fa fa-window-close"></i></span>
-                        </a></div>
+                    <div class="level-item has-text-centered"><a class="button" id="track-stop">
+                        <span class="icon is-small"><i class="fa fa-stop"></i></span>
+                    </a></div>
                 </nav>
             </nav>
         </article>
@@ -163,7 +163,7 @@
                 <th></th>
                 <td> {{ result['title'] }} </td>
                 <td>
-                    <a id="{{ result['video_id'] }}" href="#" class="button">
+                    <a id="{{ result['video_id'] }}" href="#result" class="button">
                         <i class="fa fa-play"></i>
                     </a>
                 </td>

@@ -2,28 +2,39 @@ from urllib import parse, request
 from html.parser import HTMLParser
 import subprocess
 import platform
-from logging import getLogger
+import time
+import logging
 
 import pafy
+
+from logger_configuration import configure_logger
 
 
 class YouTubePlayer:
     def __init__(self):
+        self.logger = configure_logger("youtube_player_service.log", logging.DEBUG)
+        self.logger.debug("Initializing service...")
         self.player_process = None
         self.now_playing = {
                 'video_id': None,
                 'title': None,
                 'duration': None,
+                'started_ts': None,
                 'thumbnail': None,
                 'status': 'stopped',
+                'volume': 75,
             }
-        self.logger = getLogger()
 
     def __del__(self):
         self.stop()
 
     def play(self, video_id):
+
+        # self.set_volume(self.now_playing['volume'])
+
+        self.logger.debug("Creating pafy video object for id %s ." % video_id)
         video = pafy.new(video_id)
+        self.logger.debug("Video object created. Extracting best audio url.")
         video_url = video.getbestaudio().url
 
         if platform.system() == "Windows":
@@ -36,19 +47,23 @@ class YouTubePlayer:
             self.logger.error("Unsupported OS: %s" % platform.system())
             raise OSError
 
+        self.logger.debug("Stopping previous instance.")
         self.stop()
         try:
+            self.logger.debug("Spawning player subprocess.")
             self.player_process = subprocess.Popen(player_command)
-            self.now_playing = {
+            new_status = {
                 'video_id': video.videoid,
                 'title': video.title,
                 'duration': video.duration,
+                'started_ts': time.time(),
                 'thumbnail': video.thumb,
                 'status': 'playing',
             }
+            self.now_playing.update(new_status)
             self.logger.debug("Now playing %s" % video.title)
         except Exception as e:
-            self.logger.error(repr(e))
+            self.logger.error("Error while starting player subprocess due to following exception:\n" + repr(e))
 
     def stop(self):
         try:
@@ -61,24 +76,23 @@ class YouTubePlayer:
     def set_volume(self, volume):
         if platform.system() == "Windows":
             volume_options = {
-                90: "Set to -0 dB",
-                80: "Set to -3 dB",
-                70: "Set to -6 dB",
-                60: "Set to -9 dB",
-                50: "Set to -12 dB",
-                40: "Set to -15 dB",
-                30: "Set to -18 dB",
-                20: "Set to -21 dB",
+                88: 'Set to -0 dB',
+                76: 'Set to -3 dB',
+                64: 'Set to -6 dB',
+                52: 'Set to -9 dB',
+                40: 'Set to -12 dB',
+                28: 'Set to -15 dB',
+                16: 'Set to -18 dB',
+                4: 'Set to -21 dB',
             }
             volume_string = "Mute"
             for possible_volume, possible_volume_string in volume_options.items():
-                if possible_volume <= volume < possible_volume + 10:
+                if possible_volume < volume <= possible_volume + 12:
                     volume_string = possible_volume_string
                     break
             volume_command = [
                 'C:\\Program Files (x86)\\foobar2000\\foobar2000.exe',
-                '/command:"',
-                volume_string + '"'
+                '/command:' + volume_string
             ]
         elif platform.system() == "Linux":
             volume_command = [
@@ -95,9 +109,10 @@ class YouTubePlayer:
 
         try:
             subprocess.run(volume_command)
+            self.now_playing['volume'] = volume
             self.logger.debug("Volume set to %d" % volume)
         except Exception as e:
-            self.logger.error(repr(e))
+            self.logger.error("Could not set volume due to following exception:\n" + repr(e))
 
 
 class ResultsParser(HTMLParser):
