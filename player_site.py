@@ -58,3 +58,8 @@ def set_volume():
 @flask_app.route('/get_status')
 def get_status():
     return jsonify(command_player({'command': 'get_status'}))
+
+
+@flask_app.route('/stop_video')
+def stop_video():
+    return jsonify(command_player({'command': 'stop'}))

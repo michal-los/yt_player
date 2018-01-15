@@ -29,9 +29,6 @@ class YouTubePlayer:
         self.stop()
 
     def play(self, video_id):
-
-        # self.set_volume(self.now_playing['volume'])
-
         self.logger.debug("Creating pafy video object for id %s ." % video_id)
         video = pafy.new(video_id)
         self.logger.debug("Video object created. Extracting best audio url.")

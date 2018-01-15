@@ -19,10 +19,11 @@
 
     <script>
         $(document).ready(function(){
+
             $("a[href='#result']").click(function(){
-                $video_id = $(this).attr("id")
-                $link_selector = "#".concat($video_id)
-                $row_selector = $link_selector.concat("-row")
+                $video_id = $(this).attr("id");
+                $link_selector = "#".concat($video_id);
+                $row_selector = $link_selector.concat("-row");
 
                 $.getJSON($SCRIPT_ROOT + '/play_video', {
                     video_id: $video_id
@@ -40,11 +41,23 @@
                   });
                 return false;
             });
-        });
-    </script>
 
-    <script>
-        $(document).ready(function(){
+            $("#track-stop").click(function(){
+                $.getJSON($SCRIPT_ROOT + '/stop_video', function(data) {
+                    $("tr").removeClass("is-selected");
+                    $("a[href='#result']").removeClass("is-warning");
+                    $("a[href='#result']").html('<i class="fa fa-play"></i>');
+                  });
+                return false;
+            });
+
+            $("#track-volume").mouseup(function(){
+                $.getJSON($SCRIPT_ROOT + '/set_volume', {
+                    volume: $("#track-volume").val()
+                  });
+                return false;
+            });
+
             (function worker() {
               $.getJSON($SCRIPT_ROOT + '/get_status', function(data) {
                 if (data.status == "playing")
@@ -92,9 +105,6 @@
                             <i class="fa fa-search"></i>
                         </span>
                 </div>
-                <p id="input_info" class="help">
-                    This is not YouTube video link or ID. Search will be performed.
-                </p>
             </div>
         </form>
     </div>
