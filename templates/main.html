@@ -51,7 +51,7 @@
                 return false;
             });
 
-            $("#track-volume").mouseup(function(){
+            $("#track-volume").bind("mouseup touchend", function(){
                 $.getJSON($SCRIPT_ROOT + '/set_volume', {
                     volume: $("#track-volume").val()
                   });
@@ -89,27 +89,28 @@
 </head>
 <body style="background-color: #FFB16C">
 <section class="section">
-    <div class="container" style="width: 700px">
+    <div class="container">
         <h1 class="title has-text-centered">
             YouTube player web interface
         </h1>
         <form name="search_box" action="/" method="get">
             <div class="field" id="input_container">
-                <label class="label">Enter search phrase and hit [Enter]</label>
                 <div class="control has-icons-left has-icons-right">
-                    <input id="input_field" name="search" class="input" type="text">
+                    <input id="input_field" name="search" class="input" type="text"
+                           placeholder="Enter search phrase and hit [Enter]">
                     <span class="icon is-small is-left">
                       <i class="fa fa-play-circle" aria-hidden="true"></i>
                     </span>
+                    <a href="#submit_search">
                     <span id="input_icon" class="icon is-small is-right">
                             <i class="fa fa-search"></i>
-                        </span>
+                    </span></a>
                 </div>
             </div>
         </form>
     </div>
 
-    <div class="container box is-hidden" id="track-container" style="margin-top: 10px; width: 700px;">
+    <div class="container box is-hidden" id="track-container" style="margin-top: 10px;">
         <div class="level-item has-text-centered">
             <div>
                 <p class="title" id="track-title"></p>
@@ -147,10 +148,10 @@
         </article>
     </div>
 
-    <div class="container" style="margin-top: 30px; width: 700px;">
+    <div class="container" style="margin-top: 30px;">
         {% if display_results %}
         <h2>Search results</h2>
-        <table class="table" style="width: 700px">
+        <table class="table is-fullwidth">
             <thead>
             <tr>
                 <th><i class="fa fa-circle-o-notch" aria-hidden="true"></i></th>

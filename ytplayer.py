@@ -22,7 +22,7 @@ class YouTubePlayer:
                 'started_ts': None,
                 'thumbnail': None,
                 'status': 'stopped',
-                'volume': 75,
+                'volume': 50,
             }
 
     def __del__(self):
