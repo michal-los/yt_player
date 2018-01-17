@@ -92,13 +92,17 @@ class YouTubePlayer:
                 '/command:' + volume_string
             ]
         elif platform.system() == "Linux":
+            if volume == 0:
+                scaled_volume = 0
+            else:
+                scaled_volume = int(volume * 0.5 + 50)
             volume_command = [
                 "amixer",
                 "-D",
                 "bluealsa",
                 "sset",
                 "'DANCER ROCK - A2DP'",
-                str(volume) + "%"
+                str(scaled_volume) + "%"
             ]
         else:
             self.logger.error("Unsupported OS: %s" % platform.system())
