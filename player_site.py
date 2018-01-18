@@ -7,6 +7,11 @@ flask_app = Flask(__name__)
 
 
 def command_player(control_data):
+    """
+    Sends control command with related data to player service.
+    :param control_data: Control command and related data dictionary.
+    :return: Player status received as feedback from player.
+    """
     zmq_socket = zmq.Context().socket(zmq.REQ)
     try:
         zmq_socket.connect("tcp://localhost:7773")
