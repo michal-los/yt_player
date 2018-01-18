@@ -1,3 +1,11 @@
+"""
+YouTube search tool and player application
+
+Search tool is built on top of urllib and html.parser libraries.
+
+Player class uses pafy library to extract audio stream url and video meta data
+and spawns subprocess of specific music player - foobar on Windows platform and mplayer on Linux.
+"""
 from urllib import parse, request
 from html.parser import HTMLParser
 import subprocess
@@ -11,6 +19,10 @@ from logger_configuration import configure_logger
 
 
 class YouTubePlayer:
+    """
+    pPayer class contain current or last played track meta data,
+    player control methods and player subprocess object.
+    """
     def __init__(self):
         self.logger = configure_logger("youtube_player_service.log", logging.DEBUG)
         self.logger.debug("Initializing service...")
@@ -25,30 +37,33 @@ class YouTubePlayer:
                 'volume': 50,
             }
 
+        if platform.system() == "Windows":
+            self.player_command = ["C:\\Program Files (x86)\\foobar2000\\foobar2000.exe"]
+        elif platform.system() == "Linux":
+            self.player_command = ["mplayer", "-ao", "alsa:device=bluealsa"]
+        else:
+            self.logger.error("Unsupported OS: %s" % platform.system())
+            raise OSError
+
     def __del__(self):
         self.stop()
 
     def play(self, video_id):
+        """
+        Creates pafy video object if given video_id is valid.
+        Stops previous playback, starts a new one and saves new meta data to now_playing field.
+        :param video_id: YouTube video id
+        """
         self.logger.debug("Creating pafy video object for id %s ." % video_id)
         video = pafy.new(video_id)
         self.logger.debug("Video object created. Extracting best audio url.")
         video_url = video.getbestaudio().url
 
-        if platform.system() == "Windows":
-            player = "C:\\Program Files (x86)\\foobar2000\\foobar2000.exe"
-            player_command = [player, video_url]
-        elif platform.system() == "Linux":
-            player = "mplayer"
-            player_command = [player, "-ao", "alsa:device=bluealsa", video_url]
-        else:
-            self.logger.error("Unsupported OS: %s" % platform.system())
-            raise OSError
-
         self.logger.debug("Stopping previous instance.")
         self.stop()
         try:
             self.logger.debug("Spawning player subprocess.")
-            self.player_process = subprocess.Popen(player_command)
+            self.player_process = subprocess.Popen(self.player_command + [video_url])
             new_status = {
                 'video_id': video.videoid,
                 'title': video.title,
@@ -63,6 +78,10 @@ class YouTubePlayer:
             self.logger.error("Error while starting player subprocess due to following exception:\n" + repr(e))
 
     def stop(self):
+        """
+        Stops playback by simple subprocess kill and updates playback status.
+        :return:
+        """
         try:
             self.player_process.kill()
             self.now_playing['status'] = 'stopped'
@@ -71,6 +90,10 @@ class YouTubePlayer:
             self.logger.debug("Could not kill - subprocess was not created.")
 
     def set_volume(self, volume):
+        """
+        Sets requested volume using different methods according to platform.
+        :param volume: requested volume value.
+        """
         if platform.system() == "Windows":
             volume_options = {
                 88: 'Set to -0 dB',
@@ -95,7 +118,7 @@ class YouTubePlayer:
             if volume == 0:
                 scaled_volume = 0
             else:
-                scaled_volume = int(volume * 0.5 + 50)
+                scaled_volume = int(volume * 0.75 + 25)
             volume_command = [
                 "amixer",
                 "-D",
@@ -163,6 +186,9 @@ def get_yt_search_results(search_string):
 
 
 if __name__ == '__main__':
+    """
+    Command line interface.
+    """
     _search_string = input("what do you look for? ")
     search_results = get_yt_search_results(_search_string)
 

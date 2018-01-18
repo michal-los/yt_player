@@ -1,6 +1,5 @@
 import signal
 import sys
-import logging
 from time import sleep
 
 import zmq
@@ -9,14 +8,23 @@ from ytplayer import YouTubePlayer
 
 
 class MyPlayer(YouTubePlayer):
-
+    """
+    Player class adjusted to work as service and receive commands via zeroMQ.
+    """
     def shutdown(self):
+        """
+        Stops player subprocess before shutting down main service.
+        """
         self.logger.debug("SIGTERM initialized. Shutting down service...")
         self.stop()
         self.logger.debug("Goodnight.")
         sys.exit(0)
 
     def wait_for_command(self):
+        """
+        Main player control method.
+        Receives ZeroMQ messages with commands and controls the player subprocess.
+        """
         zmq_socket = zmq.Context().socket(zmq.REP)
         zmq_socket.bind('tcp://*:7773')
 
@@ -44,20 +52,25 @@ class MyPlayer(YouTubePlayer):
             self.logger.error("Error while executing player command due to following exception:\n" + repr(err))
             zmq_socket.send_pyobj(self.now_playing)
 
+    def run_service(self):
+        """
+        Main loop method that runs the player control method in a loop and handles interrupts.
+        """
+        self.logger.debug("Configuring SIGTERM signal handler.")
+        signal.signal(signal.SIGTERM, self.shutdown)
+        self.logger.debug("Initialized. Starting main loop.")
+        while True:
+            try:
+                self.wait_for_command()
+            except KeyboardInterrupt as e:
+                self.logger.error(repr(e))
+                break
+
+            except Exception as e:
+                self.logger.error(e.__class__.__name__ + " in line " + str(e.__traceback__.tb_lineno) + ": " + str(e))
+                sleep(0.1)
+
 
 if __name__ == '__main__':
     player = MyPlayer()
-    player.logger.debug("Configuring SIGTERM signal handler.")
-    signal.signal(signal.SIGTERM, player.shutdown)
-
-    player.logger.debug("Initialized. Starting main loop.")
-    while True:
-        try:
-            player.wait_for_command()
-        except KeyboardInterrupt as e:
-            player.logger.error(repr(e))
-            break
-
-        except Exception as e:
-            player.logger.error(e.__class__.__name__ + " in line " + str(e.__traceback__.tb_lineno) + ": " + str(e))
-            sleep(0.1)
+    player.run_service()
