@@ -25,7 +25,8 @@ class MyPlayer(YouTubePlayer):
         Main player control method.
         Receives ZeroMQ messages with commands and controls the player subprocess.
         """
-        zmq_socket = zmq.Context().socket(zmq.REP)
+        zmq_context = zmq.Context()
+        zmq_socket = zmq_context.socket(zmq.REP)
         zmq_socket.bind('tcp://*:7773')
 
         self.logger.debug("Waiting for control request.")
