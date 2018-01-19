@@ -20,14 +20,14 @@ from logger_configuration import configure_logger
 
 class YouTubePlayer:
     """
-    pPayer class contain current or last played track meta data,
+    Player class contains current or last played track meta data,
     player control methods and player subprocess object.
     """
     def __init__(self):
         self.logger = configure_logger("youtube_player_service.log", logging.DEBUG)
         self.logger.debug("Initializing service...")
         self.player_process = None
-        self.now_playing = {
+        self.status_meta_data = {
                 'video_id': None,
                 'title': None,
                 'duration': None,
@@ -47,6 +47,19 @@ class YouTubePlayer:
 
     def __del__(self):
         self.stop()
+
+    def get_status(self):
+        """
+        Checks if subprocess is alive and updates status_meta_data if it is not.
+        :return: status_meta_data
+        """
+        try:
+            self.logger.debug("Checking if subprocess is still alive.")
+            if self.player_process.poll() is not None:
+                self.status_meta_data['status'] = 'stopped'
+        except AttributeError:
+            self.logger.debug("Could not poll - subprocess was not created.")
+        return self.status_meta_data
 
     def play(self, video_id):
         """
@@ -72,7 +85,7 @@ class YouTubePlayer:
                 'thumbnail': video.thumb,
                 'status': 'playing',
             }
-            self.now_playing.update(new_status)
+            self.status_meta_data.update(new_status)
             self.logger.debug("Now playing %s" % video.title)
         except Exception as e:
             self.logger.error("Error while starting player subprocess due to following exception:\n" + repr(e))
@@ -84,7 +97,7 @@ class YouTubePlayer:
         """
         try:
             self.player_process.kill()
-            self.now_playing['status'] = 'stopped'
+            self.status_meta_data['status'] = 'stopped'
             self.logger.debug("Player process stopped.")
         except AttributeError:
             self.logger.debug("Could not kill - subprocess was not created.")
@@ -133,7 +146,7 @@ class YouTubePlayer:
 
         try:
             subprocess.run(volume_command)
-            self.now_playing['volume'] = volume
+            self.status_meta_data['volume'] = volume
             self.logger.debug("Volume set to %d" % volume)
         except Exception as e:
             self.logger.error("Could not set volume due to following exception:\n" + repr(e))

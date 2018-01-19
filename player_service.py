@@ -36,21 +36,21 @@ class MyPlayer(YouTubePlayer):
             if control_data['command'] == 'play':
                 self.logger.debug("Received play command for video id %s ." % control_data['video_id'])
                 self.play(control_data['video_id'])
-                zmq_socket.send_pyobj(self.now_playing)
+                zmq_socket.send_pyobj(self.get_status())
             elif control_data['command'] == 'stop':
                 self.stop()
-                zmq_socket.send_pyobj(self.now_playing)
+                zmq_socket.send_pyobj(self.get_status())
             elif control_data['command'] == 'set_volume':
                 self.set_volume(control_data['volume'])
-                zmq_socket.send_pyobj(self.now_playing)
+                zmq_socket.send_pyobj(self.get_status())
             elif control_data['command'] == 'get_status':
-                zmq_socket.send_pyobj(self.now_playing)
+                zmq_socket.send_pyobj(self.get_status())
             else:
                 self.logger.error("Unknown command: '%s'" % control_data['command'])
-                zmq_socket.send_pyobj(self.now_playing)
+                zmq_socket.send_pyobj(self.get_status())
         except Exception as err:
             self.logger.error("Error while executing player command due to following exception:\n" + repr(err))
-            zmq_socket.send_pyobj(self.now_playing)
+            zmq_socket.send_pyobj(self.get_status())
 
     def run_service(self):
         """
