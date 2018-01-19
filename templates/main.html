@@ -44,9 +44,14 @@
 
             $("#track-pause").click(function(){
                 $.getJSON($SCRIPT_ROOT + '/pause_video', function(data) {
-                    $("tr").removeClass("is-selected");
-                    $("a[href='#result']").removeClass("is-warning");
-                    $("a[href='#result']").html('<i class="fa fa-play"></i>');
+                    if (data.status == "paused")
+                    {
+                        $("#track-pause").html('<span class="icon is-small"><i class="fa fa-play"></i></span>');
+                    }
+                    if (data.status == "playing")
+                    {
+                        $("#track-pause").html('<span class="icon is-small"><i class="fa fa-pause"></i></span>');
+                    }
                   });
                 return false;
             });
@@ -81,11 +86,11 @@
 
                     if (data.status == "paused")
                     {
-                        $("#track-pause").html(<span class="icon is-small"><i class="fa fa-play"></i></span>);
+                        $("#track-pause").html('<span class="icon is-small"><i class="fa fa-play"></i></span>');
                     }
                     if (data.status == "playing")
                     {
-                        $("#track-pause").html(<span class="icon is-small"><i class="fa fa-pause"></i></span>);
+                        $("#track-pause").html('<span class="icon is-small"><i class="fa fa-pause"></i></span>');
                     }
 
                     $link_selector = "#".concat(data.video_id)

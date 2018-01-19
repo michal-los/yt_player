@@ -61,6 +61,7 @@ class YouTubePlayer:
             self.logger.debug("Checking if subprocess is still alive.")
             if self.player_process.poll() is not None:
                 self.status_meta_data['status'] = 'stopped'
+                self.logger.debug("It is dead...")
         except AttributeError:
             self.logger.debug("Could not poll - subprocess was not created.")
         return self.status_meta_data
@@ -110,9 +111,10 @@ class YouTubePlayer:
         self.player_process.communicate('p')
 
     def _pause_foobar(self):
-        subprocess.run(self.player_command + ['/command:"Pause"'])
+        subprocess.run(self.player_command + ['/command:Pause'])
 
     def pause(self):
+        self.logger.debug("Received pause command.")
         try:
             self._pause_command()
             if self.status_meta_data['status'] == "playing":
@@ -133,7 +135,7 @@ class YouTubePlayer:
             16: 'Set to -18 dB',
             4:  'Set to -21 dB',
         }
-        volume_string = "Mute"
+        volume_string = 'Mute'
         for possible_volume, possible_volume_string in volume_options.items():
             if possible_volume < volume <= possible_volume + 12:
                 volume_string = possible_volume_string
