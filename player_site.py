@@ -65,6 +65,11 @@ def get_status():
     return jsonify(command_player({'command': 'get_status'}))
 
 
+@flask_app.route('/pause_video')
+def pause_video():
+    return jsonify(command_player({'command': 'pause'}))
+
+
 @flask_app.route('/stop_video')
 def stop_video():
     return jsonify(command_player({'command': 'stop'}))

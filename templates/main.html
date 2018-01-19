@@ -42,6 +42,15 @@
                 return false;
             });
 
+            $("#track-pause").click(function(){
+                $.getJSON($SCRIPT_ROOT + '/pause_video', function(data) {
+                    $("tr").removeClass("is-selected");
+                    $("a[href='#result']").removeClass("is-warning");
+                    $("a[href='#result']").html('<i class="fa fa-play"></i>');
+                  });
+                return false;
+            });
+
             $("#track-stop").click(function(){
                 $.getJSON($SCRIPT_ROOT + '/stop_video', function(data) {
                     $("tr").removeClass("is-selected");
@@ -60,7 +69,7 @@
 
             (function worker() {
               $.getJSON($SCRIPT_ROOT + '/get_status', function(data) {
-                if (data.status == "playing")
+                if (data.status != "stopped")
                 {
                     $thumb_tag = '<img src="'.concat(data.thumbnail);
                     $thumb_tag = $thumb_tag.concat('" alt="Image">');
@@ -69,6 +78,15 @@
                     $("#track-duration").html(data.duration);
                     $("#track-volume").attr('value', data.volume);
                     $("#track-container").removeClass("is-hidden");
+
+                    if (data.status == "paused")
+                    {
+                        $("#track-pause").html(<span class="icon is-small"><i class="fa fa-play"></i></span>);
+                    }
+                    if (data.status == "playing")
+                    {
+                        $("#track-pause").html(<span class="icon is-small"><i class="fa fa-pause"></i></span>);
+                    }
 
                     $link_selector = "#".concat(data.video_id)
                     $row_selector = $link_selector.concat("-row")
@@ -140,12 +158,14 @@
                             <p class="heading">duration</p>
                         </div>
                     </div>
-                    <div class="level-item has-text-centered"><a class="button" id="track-stop">
-                        <span class="icon is-small"><i class="fa fa-stop"></i></span>
-                    </a></div>
-                    <div class="level-item has-text-centered"><a class="button" id="track-pause">
+                    <div class="level-item has-text-centered">
+                        <a class="button" id="track-pause">
                         <span class="icon is-small"><i class="fa fa-pause"></i></span>
-                    </a></div>
+                        </a>
+                        <a class="button" id="track-stop">
+                            <span class="icon is-small"><i class="fa fa-stop"></i></span>
+                        </a>
+                    </div>
                 </nav>
             </nav>
         </article>

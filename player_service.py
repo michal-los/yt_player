@@ -40,6 +40,9 @@ class MyPlayer(YouTubePlayer):
             elif control_data['command'] == 'stop':
                 self.stop()
                 zmq_socket.send_pyobj(self.get_status())
+            elif control_data['command'] == 'pause':
+                self.pause()
+                zmq_socket.send_pyobj(self.get_status())
             elif control_data['command'] == 'set_volume':
                 self.set_volume(control_data['volume'])
                 zmq_socket.send_pyobj(self.get_status())

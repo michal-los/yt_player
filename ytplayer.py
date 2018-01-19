@@ -40,9 +40,11 @@ class YouTubePlayer:
         if platform.system() == "Windows":
             self.player_command = ["C:\\Program Files (x86)\\foobar2000\\foobar2000.exe"]
             self._get_volume_command = self._get_foobar_volume_command
+            self._pause_command = self._pause_foobar
         elif platform.system() == "Linux":
             self.player_command = ["mplayer", "-ao", "alsa:device=bluealsa"]
             self._get_volume_command = self._get_bluealsa_volume_command
+            self._pause_command = self._pause_mplayer
         else:
             self.logger.error("Unsupported OS: %s" % platform.system())
             raise OSError
@@ -104,8 +106,23 @@ class YouTubePlayer:
         except AttributeError:
             self.logger.debug("Could not kill - subprocess was not created.")
 
-    @staticmethod
-    def _get_foobar_volume_command(volume):
+    def _pause_mplayer(self):
+        self.player_process.communicate('p')
+
+    def _pause_foobar(self):
+        subprocess.run(self.player_command + ['/command:"Pause"'])
+
+    def pause(self):
+        try:
+            self._pause_command()
+            if self.status_meta_data['status'] == "playing":
+                self.status_meta_data['status'] = "paused"
+            elif self.status_meta_data['status'] == "paused":
+                self.status_meta_data['status'] = "playing"
+        except Exception as e:
+            self.logger.error("Could not set volume due to following exception:\n" + repr(e))
+
+    def _get_foobar_volume_command(self, volume):
         volume_options = {
             88: 'Set to -0 dB',
             76: 'Set to -3 dB',
@@ -114,17 +131,14 @@ class YouTubePlayer:
             40: 'Set to -12 dB',
             28: 'Set to -15 dB',
             16: 'Set to -18 dB',
-            4: 'Set to -21 dB',
+            4:  'Set to -21 dB',
         }
         volume_string = "Mute"
         for possible_volume, possible_volume_string in volume_options.items():
             if possible_volume < volume <= possible_volume + 12:
                 volume_string = possible_volume_string
                 break
-        return [
-            'C:\\Program Files (x86)\\foobar2000\\foobar2000.exe',
-            '/command:' + volume_string
-        ]
+        return self.player_command + ['/command:' + volume_string]
 
     @staticmethod
     def _get_bluealsa_volume_command(volume):
