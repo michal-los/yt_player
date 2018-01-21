@@ -1,3 +1,8 @@
+"""
+YouTube Music Player web service designed to work as user interface for the actual music player.
+Its purpose is to work as systemd service.
+Communicates with player service via ZeroMQ.
+"""
 from flask import Flask, render_template, jsonify, request
 import zmq
 

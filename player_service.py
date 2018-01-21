@@ -1,3 +1,8 @@
+"""
+YouTube Music Player service designed to work as interface between the actual music player and the web user interface.
+Its purpose is to work as systemd service and spawn player subprocess during the playback.
+Communicates with web interface via ZeroMQ.
+"""
 import signal
 import sys
 from time import sleep

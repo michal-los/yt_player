@@ -223,16 +223,20 @@ if __name__ == '__main__':
     """
     Command line interface.
     """
-    _search_string = input("what do you look for? ")
-    search_results = get_yt_search_results(_search_string)
 
-    index = 0
-    for result in search_results:
-        print(index, ". ", result['title'])
-        index += 1
+    my_player = YouTubePlayer()
+    while True:
+        try:
+            _search_string = input("\nType in the search phrase or hit [CTRL]+[C] to quit.\n")
+            search_results = get_yt_search_results(_search_string)
 
-    chosen_index = int(input("Which track do you wish to hear? "))
-    myplayer = YouTubePlayer()
-    myplayer.play(search_results[chosen_index]['video_id'])
-    input("Press [Enter] to stop playback.")
-    myplayer.stop()
+            index = 0
+            for result in search_results:
+                print(index, ". ", result['title'])
+                index += 1
+
+            chosen_index = int(input("Which track do you wish to hear? "))
+            my_player.play(search_results[chosen_index]['video_id'])
+        except KeyboardInterrupt:
+            my_player.stop()
+            break
