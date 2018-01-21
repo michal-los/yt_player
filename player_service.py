@@ -15,7 +15,7 @@ class MyPlayer(YouTubePlayer):
         """
         Stops player subprocess before shutting down main service.
         """
-        self.logger.debug("SIGTERM initialized. Shutting down service...")
+        self.logger.debug("Received SIGTERM. Shutting down service...")
         self.stop()
         self.logger.debug("Goodnight.")
         sys.exit(0)
