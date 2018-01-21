@@ -81,7 +81,7 @@ class YouTubePlayer:
         self.stop()
         try:
             self.logger.debug("Spawning player subprocess.")
-            self.player_process = subprocess.Popen(self.player_command + [video_url])
+            self.player_process = subprocess.Popen(self.player_command + [video_url], stdin=subprocess.PIPE)
             new_status = {
                 'video_id': video.videoid,
                 'title': video.title,
