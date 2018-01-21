@@ -8,8 +8,11 @@ YouTube search tool and music player application.
 
 * Search tool is built on top of urllib and html.parser libraries.
 
-* Player uses pafy library to extract audio stream url and video meta data, and spawns subprocess of specific music player - foobar on Windows platform and mplayer on Linux.
+* Player (yt_player.py) uses pafy library to extract audio stream url and video meta data, and spawns subprocess of specific music player - foobar on Windows platform and mplayer on Linux.
 * Application is built to play music on Bluetooth speaker connected to Raspberry PI so the default Linux methods run mplayer with 'bluealsa' audio output.
+* Player service (player_service.py) is designed to work as interface between the actual music player and the web user interface.
+Its purpose is to work as systemd service and spawn player subprocess during the playback.
+* Web service (player_site.py) works as user interface for the actual music player.
 
 ### Install and configure ###
 
