@@ -105,7 +105,7 @@ class YouTubePlayer:
             self.status_meta_data['status'] = 'stopped'
             self.logger.debug("Player process stopped.")
         except AttributeError:
-            self.logger.debug("Could not kill - subprocess was not created.")
+            self.logger.debug("Could not kill - player subprocess was not created.")
 
     def _pause_mplayer(self):
         self.player_process.stdin.write(b'pause\n')
