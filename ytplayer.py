@@ -42,7 +42,7 @@ class YouTubePlayer:
             self._get_volume_command = self._get_foobar_volume_command
             self._pause_command = self._pause_foobar
         elif platform.system() == "Linux":
-            self.player_command = ["mplayer", "-ao", "alsa:device=bluealsa"]
+            self.player_command = ["mplayer", "-slave", "-quiet", "-ao", "alsa:device=bluealsa"]
             self._get_volume_command = self._get_bluealsa_volume_command
             self._pause_command = self._pause_mplayer
         else:
@@ -123,7 +123,7 @@ class YouTubePlayer:
             elif self.status_meta_data['status'] == "paused":
                 self.status_meta_data['status'] = "playing"
         except Exception as e:
-            self.logger.error("Could not set volume due to following exception:\n" + repr(e))
+            self.logger.error("Could not pause due to following exception:\n" + repr(e))
 
     def _get_foobar_volume_command(self, volume):
         volume_options = {
