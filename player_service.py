@@ -60,6 +60,8 @@ class MyPlayer(YouTubePlayer):
         """
         Main loop method that runs the player control method in a loop and handles interrupts.
         """
+        self.logger.debug("Configuring SIGTERM signal handler.")
+        signal.signal(signal.SIGTERM, self.shutdown)
         self.logger.debug("Initialized. Starting main loop.")
         while True:
             try:
@@ -75,6 +77,4 @@ class MyPlayer(YouTubePlayer):
 
 if __name__ == '__main__':
     player = MyPlayer()
-    player.logger.debug("Configuring SIGTERM signal handler.")
-    signal.signal(signal.SIGTERM, player.shutdown)
     player.run_service()
