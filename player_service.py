@@ -11,7 +11,7 @@ class MyPlayer(YouTubePlayer):
     """
     Player class adjusted to work as service and receive commands via zeroMQ.
     """
-    def shutdown(self):
+    def shutdown(self, signum, frame):
         """
         Stops player subprocess before shutting down main service.
         """

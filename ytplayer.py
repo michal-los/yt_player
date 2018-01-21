@@ -108,7 +108,8 @@ class YouTubePlayer:
             self.logger.debug("Could not kill - subprocess was not created.")
 
     def _pause_mplayer(self):
-        self.player_process.stdin.write(b'p\n')
+        self.player_process.stdin.write(b'pause\n')
+        self.player_process.stdin.flush()
 
     def _pause_foobar(self):
         subprocess.run(self.player_command + ['/command:Pause'])
